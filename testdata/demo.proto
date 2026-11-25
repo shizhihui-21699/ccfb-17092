@@ -1,0 +1,25 @@
+syntax = "proto3";
+package demo;
+option go_package = "grpcscope/testdata/demo";
+
+message Empty {}
+message KeyRequest { string key = 1; }
+message StatusReply { string value = 1; }
+message FlushRequest { bool force = 1; }
+message ConfigRequest { string key = 1; string value = 2; }
+
+service AdminService {
+  rpc FlushCache(FlushRequest) returns (StatusReply);
+  rpc UpdateConfig(ConfigRequest) returns (StatusReply);
+  rpc GetStatus(Empty) returns (StatusReply);
+  rpc GetConfig(KeyRequest) returns (StatusReply);
+  rpc PurgeAll(Empty) returns (StatusReply);
+  rpc WatchAdmin(Empty) returns (stream StatusReply);
+  rpc BulkImport(ConfigRequest) returns (StatusReply);
+}
+
+service BizService {
+  rpc GetUser(KeyRequest) returns (StatusReply);
+  rpc ListUsers(Empty) returns (StatusReply);
+  rpc CreateUser(ConfigRequest) returns (StatusReply);
+}

@@ -1,0 +1,82 @@
+# grpcscope scan plan
+#
+# Every field has a safe default. A file with only `targets:` performs
+# read-only discovery: reflection listing, the inert health check, and the
+# encoding-existence oracle. Nothing here sends a request body into a handler
+# unless `mode` and the per-method risk verdict both permit it.
+
+mode: safe            # safe | standard | aggressive
+
+targets:
+  # Explicit addresses are always scanned.
+  addresses:
+    - 10.12.3.40:50051
+    - 127.0.0.1:9090
+  ports:
+    - 50051
+    - 9090
+    - 8443
+  # Networks to sweep across `ports`. A prefix shorter than /16 is rejected.
+  # Sweeps over MaxTargets addresses need -allow-large on the command line.
+  # cidrs:
+  #   - 10.12.0.0/24
+  # Newline-delimited host:port lists; uncomment to use.
+  # files:
+  #   - ./hosts.txt
+
+probe:
+  concurrency: 32              # in-flight probes
+  rate_per_sec: 200            # token bucket across the whole scan
+  timeout: 4s                  # per probe
+  connect_timeout: 1500ms
+  reflection_timeout: 6s
+  max_methods_per_service: 2000
+  # Re-probe every method discovered from a descriptor or wordlist against the
+  # live server, so nothing is reported present without wire proof.
+  confirm_with_oracle: true
+
+discovery:
+  guess_services: true
+  guess_methods: true
+  max_guess_services: 400
+  max_guess_methods_per_service: 120
+  reflection_probe: true
+  health_probe: true
+
+# Optional extra candidate names, merged over the built-in lists.
+# wordlists:
+#   services:
+#     - ./wordlists/services.txt
+#   methods:
+#     - ./wordlists/methods.txt
+
+descriptors:
+  # .proto sources (files or directories) and compiled descriptor sets.
+  # Supplying these turns "guess the method names" into "read them".
+  # protos:
+  #   - ./proto/
+  # sets:
+  #   - ./api.pb
+
+safety:
+  # Regular expressions matched against the full method path
+  # (/pkg.Service/Method). A match under never_call means no request body is
+  # ever sent, even an empty one; only the inert oracle touches it.
+  never_call:
+    - '^/payments\.WalletService/'
+    - '^/core\.(Ledger|Accounting)Service/'
+  # A match under never_touch is not probed at all, not even by the oracle.
+  never_touch:
+    - '^/prod\.CriticalService/'
+  # Re-enable body probes inside a never_call region for specific read-only
+  # methods. allowed_call cannot override never_touch.
+  allowed_call: []
+
+output:
+  dir: results
+  formats:
+    - json
+    - markdown
+    - sarif
+  # Exit non-zero when a finding at or above this severity exists (CI gating).
+  fail_on: high

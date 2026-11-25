@@ -16,3 +16,7 @@ node_modules/
 __pycache__/
 .venv/
 venv/
+
+# grpcscope build and scan output
+/grpcscope
+/results/
