@@ -1,0 +1,21 @@
+[
+  {
+    "name": "team-cache-admin",
+    "kind": "cache_mgmt",
+    "severity": "critical",
+    "method_keywords": ["flushdb", "flushall", "clearall", "purge"],
+    "service_keywords": ["cache", "redis"]
+  },
+  {
+    "name": "feature-flag-admin",
+    "kind": "config_mgmt",
+    "severity": "high",
+    "method_keywords": ["togglefeature", "setfeature", "rollout"]
+  },
+  {
+    "name": "internal-debug-endpoint",
+    "kind": "debug",
+    "severity": "high",
+    "full_name_regex": "(?i)/.*\\.(debug|internal)\\..*/(exec|shell|eval|pprof)"
+  }
+]

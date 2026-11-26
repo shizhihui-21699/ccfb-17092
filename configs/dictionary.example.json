@@ -1,0 +1,27 @@
+{
+  "services": [
+    "admin.AdminService",
+    "admin.ConfigService",
+    "internal.ops.ControlService",
+    "system.RuntimeService"
+  ],
+  "prefixes": ["admin", "internal", "ops", "system"],
+  "service_short_names": [
+    "AdminService",
+    "ConfigService",
+    "CacheService",
+    "ControlService",
+    "MaintenanceService"
+  ],
+  "methods": [
+    "FlushAll",
+    "ClearCache",
+    "UpdateConfig",
+    "ReloadConfig",
+    "Shutdown",
+    "Drain",
+    "SetLogLevel",
+    "List",
+    "Get"
+  ]
+}
